@@ -1,0 +1,51 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import org.json.JSONObject;
+
+public class WeatherApp {
+
+    public static void main(String[] args) {
+        try {
+            String city = "London"; // Change the city name to get the weather information of another city
+            String apikey = "your_api_key"; // Replace with your API key
+            
+            String apiUrl = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=" + apikey;
+            
+            URL url = new URL(apiUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+            
+            while ((inputLine = reader.readLine()) != null) {
+                response.append(inputLine);
+            }
+            reader.close();
+            
+            JSONObject jsonObject = new JSONObject(response.toString());
+            
+            JSONObject main = jsonObject.getJSONObject("main");
+            double temp = main.getDouble("temp");
+            double feelsLike = main.getDouble("feels_like");
+            double pressure = main.getDouble("pressure");
+            double humidity = main.getDouble("humidity");
+            
+            JSONObject weather = jsonObject.getJSONArray("weather").getJSONObject(0);
+            String description = weather.getString("description");
+            
+            System.out.println("Weather information for " + city + ":");
+            System.out.println("Temperature: " + temp + "K");
+            System.out.println("Feels like: " + feelsLike + "K");
+            System.out.println("Pressure: " + pressure + "hPa");
+            System.out.println("Humidity: " + humidity + "%");
+            System.out.println("Description: " + description);
+            
+        } catch (Exception e) {
+            System.out.println("An error occurred: " + e.getMessage());
+        }
+    }
+}
